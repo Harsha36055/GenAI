@@ -1,14 +1,4 @@
-"""
-KrishiMitra - FastAPI backend.
 
-Run (from this project folder):
-    python -m pip install -r requirements.txt
-    export GEMINI_API_KEY="your-key"      # or POST it to /api/set-key at runtime
-    python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
-
-Design rule: every AI/network call has an offline fallback from knowledge_base.py,
-so the app still answers when the farmer's connection or the API key fails.
-"""
 import json
 import os
 from pathlib import Path
@@ -25,11 +15,9 @@ from google.genai import types
 
 import knowledge_base as kb
 
-# ---------------------------------------------------------------- configuration
-# gemini-1.5-flash has been retired by Google; override with GEMINI_MODEL if needed.
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 FRONTEND_DIR = Path(__file__).resolve().parent
-MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5 MB cap keeps uploads sane on 3G/4G
+MAX_IMAGE_BYTES = 5 * 1024 * 1024  
 
 LANG_NAMES = {
     "en": "English", "hi": "Hindi", "pa": "Punjabi",
@@ -48,9 +36,7 @@ SYSTEM_PROMPT = (
 app = FastAPI(title="KrishiMitra API", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-# ---------------------------------------------------------------- Gemini client
 _client: Optional[genai.Client] = None
-
 
 def get_client() -> Optional[genai.Client]:
     """Lazily build the Gemini client; returns None if no key is configured."""
@@ -60,10 +46,8 @@ def get_client() -> Optional[genai.Client]:
         _client = genai.Client(api_key=key)
     return _client
 
-
-# ---------------------------------------------------------------- schemas
 class ChatTurn(BaseModel):
-    role: str  # "user" | "model"
+    role: str  
     text: str
 
 
@@ -76,8 +60,6 @@ class ChatRequest(BaseModel):
 class KeyRequest(BaseModel):
     api_key: str
 
-
-# ---------------------------------------------------------------- health & key
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "ai_configured": bool(os.getenv("GEMINI_API_KEY")), "model": MODEL}
@@ -94,8 +76,6 @@ async def set_key(req: KeyRequest):
     _client = None
     return {"ok": True}
 
-
-# ---------------------------------------------------------------- chat
 @app.post("/api/chat")
 async def chat(req: ChatRequest):
     """Multi-turn advisor. The frontend sends the running history each time (stateless server)."""
@@ -108,7 +88,7 @@ async def chat(req: ChatRequest):
     contents = [
         types.Content(role="user" if t.role == "user" else "model",
                       parts=[types.Part.from_text(text=t.text)])
-        for t in req.history[-10:]  # keep prompts small
+        for t in req.history[-10:]  
     ]
     contents.append(types.Content(role="user", parts=[types.Part.from_text(text=req.message)]))
 
@@ -123,12 +103,10 @@ async def chat(req: ChatRequest):
             ),
         )
         return {"reply": resp.text, "source": "ai"}
-    except Exception:  # network, quota, bad key... fall back instead of failing
+    except Exception: 
         return {"reply": kb.fallback_chat_reply(req.message, req.lang),
                 "reply_key": kb.fallback_chat_reply_key(req.message), "source": "offline"}
 
-
-# ---------------------------------------------------------------- disease diagnosis
 DIAG_PROMPT = (
     "Analyse this crop/leaf photo. Respond ONLY with JSON using exactly these keys: "
     '{{"crop": str, "disease": str, "confidence": "low|medium|high", "severity": "low|medium|high", '
@@ -169,8 +147,6 @@ async def diagnose(
     except Exception:
         return {"diagnosis": kb.fallback_diagnosis(crop_hint), "source": "offline"}
 
-
-# ---------------------------------------------------------------- weather + spray safety
 def spray_advice(temp: float, humidity: float, wind: float, rain_next_24h: float) -> dict:
     """Rule-of-thumb spray window check. Thresholds are common extension-advice heuristics."""
     reasons = []
@@ -186,7 +162,7 @@ def spray_advice(temp: float, humidity: float, wind: float, rain_next_24h: float
 
 
 @app.get("/api/weather")
-async def weather(lat: float = 13.08, lon: float = 80.27):  # defaults: Chennai
+async def weather(lat: float = 13.08, lon: float = 80.27):  
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat, "longitude": lon, "timezone": "auto", "forecast_days": 5,
@@ -215,8 +191,6 @@ async def weather(lat: float = 13.08, lon: float = 80.27):  # defaults: Chennai
         "spray": spray_advice(cur["temperature_2m"], cur["relative_humidity_2m"], cur["wind_speed_10m"], forecast[0]["rain_mm"] or 0),
     }
 
-
-# ---------------------------------------------------------------- mandi, schemes
 @app.get("/api/mandi")
 async def mandi(crop: str = "", state: str = ""):
     """Prices vs MSP. Uses offline indicative data; swap in the data.gov.in AGMARKNET API for live rates."""
@@ -227,7 +201,5 @@ async def mandi(crop: str = "", state: str = ""):
 async def schemes(state: str = ""):
     return {"schemes": kb.get_schemes(state)}
 
-
-# ---------------------------------------------------------------- serve frontend (must be last)
 if FRONTEND_DIR.exists():
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
