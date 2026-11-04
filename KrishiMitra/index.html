@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2e7d32">
+  <title>KrishiMitra</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="glass">
+    <div><h1 data-i18n="appName"></h1><small data-i18n="tagline"></small></div>
+    <div class="controls">
+      <select id="lang" aria-label="Language" data-i18n-a="ariaLanguage">
+        <option value="en">English</option><option value="hi">हिन्दी</option><option value="pa">ਪੰਜਾਬੀ</option>
+        <option value="mr">मराठी</option><option value="te">తెలుగు</option><option value="ta">தமிழ்</option>
+      </select>
+      <button id="theme" aria-label="Toggle dark mode" data-i18n-a="ariaTheme">🌓</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Chat -->
+    <section id="tab-chat" class="tab active">
+      <div id="log" class="log" aria-live="polite"></div>
+      <div class="composer glass">
+        <button id="mic" aria-label="Speak" data-i18n-a="ariaSpeak">🎤</button>
+        <input id="msg" type="text" data-i18n-ph="placeholder" autocomplete="off">
+        <button id="send" class="primary" data-i18n="send"></button>
+      </div>
+    </section>
+
+    <!-- Crop doctor -->
+    <section id="tab-diagnose" class="tab">
+      <label id="drop" class="drop glass" for="file"><span data-i18n="upload"></span><img id="preview" alt="" hidden></label>
+      <input id="file" type="file" accept="image/*" hidden>
+      <input id="camera" type="file" accept="image/*" capture="environment" hidden>
+      <input id="crop" type="text" data-i18n-ph="cropHint">
+      <div class="row"><button id="shoot" data-i18n="takePhoto"></button><button id="analyze" class="primary" data-i18n="analyze"></button></div>
+      <div id="diagResult" class="card glass" hidden></div>
+    </section>
+
+    <section id="tab-weather" class="tab"><div id="weatherOut" class="card glass"></div></section>
+    <section id="tab-mandi" class="tab"><div id="mandiOut"></div></section>
+    <section id="tab-schemes" class="tab"><div id="schemesOut"></div></section>
+  </main>
+
+  <nav class="glass" id="tabs">
+    <button data-tab="chat" class="active"><span>💬</span><small data-i18n="tabChat"></small></button>
+    <button data-tab="diagnose"><span>🌿</span><small data-i18n="tabDiagnose"></small></button>
+    <button data-tab="weather"><span>⛅</span><small data-i18n="tabWeather"></small></button>
+    <button data-tab="mandi"><span>🧺</span><small data-i18n="tabMandi"></small></button>
+    <button data-tab="schemes"><span>📜</span><small data-i18n="tabSchemes"></small></button>
+  </nav>
+
+  <script src="translations.js?v=6"></script>
+  <script src="script.js?v=6"></script>
+</body>
+</html>
