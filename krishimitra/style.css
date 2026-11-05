@@ -26,7 +26,7 @@ main { padding: 8px 12px; max-width: 720px; margin: auto; }
 .bubble { max-width: 88%; padding: 10px 14px; border-radius: 16px; white-space: pre-wrap; }
 .bubble.me { align-self: flex-end; background: var(--bubble-me); } .bubble.ai { align-self: flex-start; background: var(--bubble-ai); }
 .bubble button { margin-top: 6px; padding: 4px 10px; min-height: 32px; font-size: .85rem; }
-.composer { position: fixed; left: 8px; right: 8px; bottom: 84px; display: flex; flex-direction: column; gap: 4px; padding: 8px; max-width: 704px; margin: auto; }
+.composer { position: fixed; z-index: 6; left: 8px; right: 8px; bottom: 84px; display: flex; flex-direction: column; gap: 4px; padding: 8px; max-width: 704px; margin: auto; }
 .composer-row { display: flex; gap: 6px; }
 .composer input { flex: 1; min-width: 0; }
 .chat-status { margin: 0; padding: 0 4px; font-size: .75rem; opacity: .8; }
@@ -37,7 +37,7 @@ main { padding: 8px 12px; max-width: 720px; margin: auto; }
 .badge { display: inline-block; padding: 4px 12px; border-radius: 99px; font-weight: 600; color: #fff; }
 .ok { background: var(--green-d); } .bad { background: #c62828; }
 .stats { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0; }
-nav { position: fixed; left: 8px; right: 8px; bottom: 8px; display: flex; justify-content: space-around; padding: 6px; max-width: 704px; margin: auto; z-index: 5; }
+nav { position: fixed; left: 8px; right: 8px; bottom: 8px; display: flex; justify-content: space-around; padding: 6px; max-width: 704px; margin: auto; z-index: 7; }
 nav button { flex: 1; border: 0; background: none; display: grid; justify-items: center; padding: 4px; }
 nav button.active { background: var(--bubble-me); } nav span { font-size: 1.3rem; } nav small { font-size: .7rem; }
 @media (min-width: 720px) { body { font-size: 18px; } }
